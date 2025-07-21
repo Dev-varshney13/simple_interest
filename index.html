@@ -259,36 +259,33 @@
 
       const now = new Date();
       const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth() + 1;
-      const currentDay = now.getDate();
 
-      // Years: from 2000 up to current year only
-      for (let y = 2000; y <= currentYear; y++) {
+      // For start date, show up to (current date + 1 year)
+      let endYear = prefix === "start" ? currentYear + 1 : currentYear;
+
+      // Years: from 2000 up to endYear only
+      for (let y = 2000; y <= endYear; y++) {
         yearSel.innerHTML += `<option value="${y}">${y}</option>`;
       }
 
-      // Months: up to current month if current year selected, else all months
-      let selectedYear = blank ? currentYear : yearSel.value || currentYear;
+      // Months: always show 1 to 12
       for (let m = 1; m <= 12; m++) {
-        if (parseInt(selectedYear) === currentYear && m > currentMonth) break;
         monthSel.innerHTML += `<option value="${m}">${m}</option>`;
       }
 
-      // Days: up to current day if current year and month selected, else all days
-      let selectedMonth = blank ? currentMonth : monthSel.value || currentMonth;
+      // Days: always show 1 to 31
       for (let d = 1; d <= 31; d++) {
-        if (parseInt(selectedYear) === currentYear && parseInt(selectedMonth) === currentMonth && d > currentDay) break;
         daySel.innerHTML += `<option value="${d}">${d}</option>`;
       }
 
       if (!blank && prefix === "end") {
-        daySel.value = currentDay;
-        monthSel.value = currentMonth;
-        yearSel.value = currentYear;
+        daySel.value = now.getDate();
+        monthSel.value = now.getMonth() + 1;
+        yearSel.value = now.getFullYear();
       }
     }
 
-    populateDateSelectors("start", true); // Start date blank
+    populateDateSelectors("start", true); // Start date blank, up to current date + 1 year
     populateDateSelectors("end");         // End date defaults to today
 
     function getDateFromSelectors(prefix) {
@@ -327,12 +324,31 @@
           return;
         }
 
-        const diffTime = endDate - startDate;
-        const totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        totalMonths = Math.floor(totalDays / 30.44); // approximate month
-        const years = Math.floor(totalMonths / 12);
-        const months = totalMonths % 12;
-        const days = totalDays % Math.floor(30.44);
+        // Calculate years, months, days difference
+        let startDay = startDate.getDate();
+        let startMonth = startDate.getMonth();
+        let startYear = startDate.getFullYear();
+
+        let endDay = endDate.getDate();
+        let endMonth = endDate.getMonth();
+        let endYear = endDate.getFullYear();
+
+        let years = endYear - startYear;
+        let months = endMonth - startMonth;
+        let days = endDay - startDay;
+
+        if (days < 0) {
+          months -= 1;
+          // Get days in previous month
+          let prevMonth = new Date(endYear, endMonth, 0);
+          days += prevMonth.getDate();
+        }
+        if (months < 0) {
+          years -= 1;
+          months += 12;
+        }
+
+        totalMonths = years * 12 + months;
         timeDetail = `${years} year(s), ${months} month(s), ${days} day(s)`;
       }
 
