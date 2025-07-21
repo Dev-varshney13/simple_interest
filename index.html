@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Interest Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 10px;
+      width: 100%; /* changed from max-width: 100% */
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #1976d2;
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: 500;
+      font-size: 1.1em;
+      color: #333;
+    }
+
+    input, select {
+      padding: 12px;
+      width: 100%;
+      margin-top: 6px;
+      font-size: 1.1em;
+      border-radius: 10px;
+      border: 1px solid #bdbdbd;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus {
+      border-color: #1976d2;
+      outline: none;
+    }
+
+    .time-option {
+      display: none;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 14px;
+      background: #dff0d8;
+      border: 1px solid #3c763d;
+      border-radius: 10px;
+      display: none;
+      font-size: 1.2em;
+      color: #256029;
+      box-shadow: 0 2px 8px rgba(60, 118, 61, 0.08);
+    }
+
+    .date-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .date-row select {
+      flex: 1;
+      font-size: 1.1em;
+      height: 48px;
+      border-radius: 10px;
+      border: 1px solid #bdbdbd;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 18px;
+      font-size: 1.2em;
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover, button:active {
+      background: #1565c0;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 4vw;
+      }
+      h2 {
+        font-size: 1.4em;
+      }
+      input, select, button {
+        font-size: 1em;
+        padding: 10px;
+      }
+      .date-row select {
+        height: 40px;
+      }
+      #result {
+        font-size: 1em;
+        padding: 10px;
+      }
+    }
+
+    .dashboard-header {
+      background: #ff9800;
+      color: #fff;
+      padding: 0;
+      margin: 0;
+      width: 100vw;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 2px 8px rgba(255,152,0,0.08);
+    }
+
+    .dashboard-header span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 56px;
+      font-size: clamp(1.2em, 5vw, 2em);
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    .main-card {
+      flex: 1;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+
+    .dashboard-footer {
+      background: #ff9800;
+      color: #fff;
+      text-align: center;
+      padding: 12px 0;
+      box-shadow: 0 -2px 8px rgba(255,152,0,0.08);
+      margin-top: 24px;
+      font-size: 1em;
+      width: 100vw;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 0;
+    }
+  </style>
+</head>
+<body>
+  <div style="width:100vw;position:relative;left:50%;transform:translateX(-50%);background:#fff3e0;color:#e65100;text-align:center;font-size:1.2em;padding:8px 0 4px 0;font-weight:600;">
+    || ॐ बागेश्वराय नमः ||
+  </div>
+  <header class="dashboard-header">
+    <span>Simple Interest Calculator</span>
+  </header>
+
+  <main class="main-card">
+    <div style="display: flex; gap: 32px; margin-bottom: 8px;">
+      <div style="flex: 2;">
+        <label>Principal Amount:</label>
+        <input type="number" id="principal" placeholder="Enter principal amount" required>
+      </div>
+      <div style="flex: 1;">
+        <label>Rate Type:</label>
+        <select id="rateType">
+          <option value="year">Per Year</option>
+          <option value="month" selected>Per Month</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 32px; margin-bottom: 8px;">
+      <div style="flex: 2;">
+        <label>Rate of Interest:</label>
+        <input type="number" id="rate" placeholder="Enter rate" required>
+      </div>
+      <div style="flex: 1;">
+        <label>Time Type:</label>
+        <select id="timeInputType" onchange="toggleTimeInput()">
+          <option value="duration">Duration</option>
+          <option value="dates" selected>Dates</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="durationInput" class="time-option">
+      <label>Time Duration:</label>
+      <input type="number" id="years" placeholder="Years">
+      <input type="number" id="months" placeholder="Months">
+    </div>
+
+    <div id="dateInput" class="time-option">
+      <label>Start Date:</label>
+      <div class="date-row">
+        <select id="startDay">
+          <option value="">DD</option>
+        </select>
+        <select id="startMonth">
+          <option value="">MM</option>
+        </select>
+        <select id="startYear">
+          <option value="">YYYY</option>
+        </select>
+      </div>
+      <label>End Date:</label>
+      <div class="date-row">
+        <select id="endDay"></select>
+        <select id="endMonth"></select>
+        <select id="endYear"></select>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 18px;">
+      <button onclick="clearForm()" style="flex:1;background:#e0e0e0;color:#333;">Clear</button>
+      <button onclick="calculateSI()" style="flex:1;">Calculate</button>
+    </div>
+    <div id="result"></div>
+  </main>
+
+  <footer class="dashboard-footer">
+    Designed by -Dev varshney❤️
+  </footer>
+
+  <script>
+    function toggleTimeInput() {
+      const inputType = document.getElementById("timeInputType").value;
+      document.getElementById("durationInput").style.display = inputType === "duration" ? "block" : "none";
+      document.getElementById("dateInput").style.display = inputType === "dates" ? "block" : "none";
+    }
+
+    // Populate day, month, year dropdowns
+    function populateDateSelectors(prefix, blank = false) {
+      const daySel = document.getElementById(prefix + "Day");
+      const monthSel = document.getElementById(prefix + "Month");
+      const yearSel = document.getElementById(prefix + "Year");
+
+      daySel.innerHTML = prefix === "start" ? `<option value="">DD</option>` : "";
+      monthSel.innerHTML = prefix === "start" ? `<option value="">MM</option>` : "";
+      yearSel.innerHTML = prefix === "start" ? `<option value="">YYYY</option>` : "";
+
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+      const currentDay = now.getDate();
+
+      // Years: from 2000 up to current year only
+      for (let y = 2000; y <= currentYear; y++) {
+        yearSel.innerHTML += `<option value="${y}">${y}</option>`;
+      }
+
+      // Months: up to current month if current year selected, else all months
+      let selectedYear = blank ? currentYear : yearSel.value || currentYear;
+      for (let m = 1; m <= 12; m++) {
+        if (parseInt(selectedYear) === currentYear && m > currentMonth) break;
+        monthSel.innerHTML += `<option value="${m}">${m}</option>`;
+      }
+
+      // Days: up to current day if current year and month selected, else all days
+      let selectedMonth = blank ? currentMonth : monthSel.value || currentMonth;
+      for (let d = 1; d <= 31; d++) {
+        if (parseInt(selectedYear) === currentYear && parseInt(selectedMonth) === currentMonth && d > currentDay) break;
+        daySel.innerHTML += `<option value="${d}">${d}</option>`;
+      }
+
+      if (!blank && prefix === "end") {
+        daySel.value = currentDay;
+        monthSel.value = currentMonth;
+        yearSel.value = currentYear;
+      }
+    }
+
+    populateDateSelectors("start", true); // Start date blank
+    populateDateSelectors("end");         // End date defaults to today
+
+    function getDateFromSelectors(prefix) {
+      const day = parseInt(document.getElementById(prefix + "Day").value);
+      const month = parseInt(document.getElementById(prefix + "Month").value) - 1;
+      const year = parseInt(document.getElementById(prefix + "Year").value);
+      if (isNaN(day) || isNaN(month) || isNaN(year)) return NaN;
+      return new Date(year, month, day);
+    }
+
+    function calculateSI() {
+      const P = parseFloat(document.getElementById("principal").value);
+      const R = parseFloat(document.getElementById("rate").value);
+      const rateType = document.getElementById("rateType").value;
+      const timeType = document.getElementById("timeInputType").value;
+
+      if (isNaN(P) || isNaN(R)) {
+        alert("Please enter valid Principal and Rate.");
+        return;
+      }
+
+      let totalMonths = 0;
+      let timeDetail = "";
+
+      if (timeType === "duration") {
+        const years = parseInt(document.getElementById("years").value) || 0;
+        const months = parseInt(document.getElementById("months").value) || 0;
+        totalMonths = (years * 12) + months;
+        timeDetail = `${years} year(s), ${months} month(s)`;
+      } else if (timeType === "dates") {
+        const startDate = getDateFromSelectors("start");
+        const endDate = getDateFromSelectors("end");
+
+        if (isNaN(startDate) || isNaN(endDate) || endDate <= startDate) {
+          alert("Please enter valid Start and End dates.");
+          return;
+        }
+
+        const diffTime = endDate - startDate;
+        const totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        totalMonths = Math.floor(totalDays / 30.44); // approximate month
+        const years = Math.floor(totalMonths / 12);
+        const months = totalMonths % 12;
+        const days = totalDays % Math.floor(30.44);
+        timeDetail = `${years} year(s), ${months} month(s), ${days} day(s)`;
+      }
+
+      if (totalMonths <= 0) {
+        alert("Time duration must be greater than 0.");
+        return;
+      }
+
+      let T = rateType === "year" ? totalMonths / 12 : totalMonths;
+      let SI = (P * R * T) / 100;
+      let totalAmount = P + SI;
+
+      let resultHTML = `
+        <div style="padding:10px;">
+          <div style="margin-bottom:8px;"><strong>Principal:</strong> ₹${P.toFixed(2)}</div>
+          <div style="margin-bottom:8px;"><strong>Interest:</strong> ₹${SI.toFixed(2)}</div>
+          <div style="margin-bottom:8px;"><strong>Total Amount:</strong> ₹${totalAmount.toFixed(2)}</div>
+          <div style="margin-top:12px;"><strong>Total Time:</strong> ${timeDetail}</div>
+        </div>
+      `;
+
+      document.getElementById("result").innerHTML = resultHTML;
+      document.getElementById("result").style.display = "block";
+    }
+
+    function clearForm() {
+      document.getElementById("principal").value = "";
+      document.getElementById("rate").value = "";
+      document.getElementById("rateType").value = "month";
+      document.getElementById("timeInputType").value = "dates";
+      document.getElementById("years").value = "";
+      document.getElementById("months").value = "";
+      populateDateSelectors("start", true);
+      populateDateSelectors("end");
+      document.getElementById("result").style.display = "none";
+      toggleTimeInput();
+    }
+
+    // Show "Select Dates" input by default
+    document.getElementById("timeInputType").value = "dates";
+    toggleTimeInput();
+  </script>
+</body>
+</html>
